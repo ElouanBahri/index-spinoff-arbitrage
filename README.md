@@ -50,33 +50,3 @@ This repo uses **Python == 3.12.13**.
 conda env create -f environment.yaml
 conda activate index_spinoff_arbitrage_env
 ```
-
-## Repository Structure
-
-```text
-spinoff-index-arb/
-│
-├── data/
-│   ├── raw/
-│   ├── processed/
-│   └── external/
-│
-├── notebooks/
-│
-├── src/
-│   ├── data/
-│   ├── features/
-│   ├── signals/
-│   ├── models/
-│   ├── portfolio/
-│   └── backtesting/
-│
-├── reports/
-├── figures/
-├── README.md
-└── environment.yaml
-```
-
-## Disclaimer
-
-This repository is intended for research and educational purposes only and does not constitute investment advice.
