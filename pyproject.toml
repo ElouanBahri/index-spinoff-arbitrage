@@ -1,0 +1,13 @@
+[tool.pyright]
+include = ["src/**/*.py", "test/**/*.py"]
+exclude = ["**/__pycache__", ".pytest_cache", ".ruff_cache", "**.*"]
+pythonVersion = "3.12"
+
+typeCheckingMode = "off" 
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "W"]
