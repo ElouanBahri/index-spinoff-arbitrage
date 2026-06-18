@@ -3,8 +3,8 @@ import pandas as pd
 # ==========================================
 # CONFIGURATION: CHANGE THESE PATHS
 # ==========================================
-INPUT_FILE_PATH = "spy_spinoff_raw.csv"
-OUTPUT_FILE_PATH = "cleaned_spinoff_data.csv"
+INPUT_FILE_PATH = "data/clean/cleaned_spinoff_data.csv"
+OUTPUT_FILE_PATH = "data/clean/cleaned_spinoff_data.csv"
 
 
 def clean_and_rename_bloomberg(input_path, output_path):
@@ -50,7 +50,13 @@ def clean_and_rename_bloomberg(input_path, output_path):
     
     print("\n--- Processing Complete! Cleaned Preview: ---")
     print(df.head())
+
+    #df['Effective Date'] = pd.to_datetime(df['Effective Date'], format='%m/%d/%Y')
+    #df['Announce/Declared Date'] = pd.to_datetime(df['Announce/Declared Date'], format='%m/%d/%Y')
     
+    # Standard pandas syntax to sort by date (ascending)
+    df = df.sort_values(by='Effective Date', ascending=True)
+
     # 4. Save to a fresh CSV file
     df.to_csv(output_path, index=False)
     print(f"\nSuccess! File formatted and saved to: {output_path}")
