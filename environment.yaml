@@ -17,5 +17,6 @@ dependencies:
   - statsmodels>=0.14.6
   - xgboost>=3.2.0
   - pip
+  - seaborn>=0.13.2
   - pip:
     - fastapi[standard]>=0.135
