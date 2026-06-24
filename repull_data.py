@@ -26,26 +26,42 @@ Outputs (all written to data/raw/):
 """
 
 import os
-import wrds
-import pandas as pd
+import builtins
+import getpass
 from pathlib import Path
 
-# load .env manually (python-dotenv may not be installed)
+# Load .env before anything else
 _env_path = Path(__file__).parent / ".env"
 if _env_path.exists():
-    for line in _env_path.read_text().splitlines():
-        line = line.strip()
-        if line and not line.startswith("#") and "=" in line:
-            k, v = line.split("=", 1)
-            os.environ.setdefault(k.strip(), v.strip())
+    for _line in _env_path.read_text().splitlines():
+        _line = _line.strip()
+        if _line and not _line.startswith("#") and "=" in _line:
+            _k, _v = _line.split("=", 1)
+            os.environ.setdefault(_k.strip(), _v.strip())
+
+WRDS_USERNAME = os.getenv("WRDS_USERNAME", "vedantbhagat")
+WRDS_PASSWORD = os.getenv("WRDS_PASSWORD", "")
+
+# The installed WRDS library always calls input()/getpass() even when credentials
+# are passed explicitly. Patch both so the script runs without a terminal.
+_real_input = builtins.input
+
+def _auto_input(prompt=""):
+    if "username" in prompt.lower() and WRDS_USERNAME:
+        print(f"{prompt}{WRDS_USERNAME}")
+        return WRDS_USERNAME
+    return _real_input(prompt)
+
+builtins.input = _auto_input
+# Password: leave getpass alone — WRDS web password must be typed interactively
+
+import wrds
+import pandas as pd
 
 RAW_DIR = Path("data/raw")
 CLEAN_DIR = Path("data/clean")
 RAW_DIR.mkdir(parents=True, exist_ok=True)
-
-WRDS_USERNAME = os.getenv("WRDS_USERNAME", "vedantbhagat")
-WRDS_PASSWORD = os.getenv("WRDS_PASSWORD")
-CRSP_START = "2019-01-01"        # daily prices start date (covers all spinoff events)
+CRSP_START = "2010-01-01"        # daily prices start date (10yr window before first spinoff)
 CONSTITUENT_START = "1990-01-01" # constituent history start — captures all pre-1996 members
 
 SP500_NAME_PATTERNS = [
@@ -222,7 +238,7 @@ def pull_passive_aum(db) -> tuple[pd.DataFrame, pd.DataFrame]:
                    mtna AS tna_millions, mret AS monthly_ret
             FROM crsp_q_mutualfunds.fund_summary
             WHERE crsp_fundno IN ({fundno_str})
-              AND caldt >= '2018-01-01'
+              AND caldt >= '2010-01-01'
             ORDER BY crsp_fundno, caldt
         """, date_cols=["date"])
         frames.append(df)

@@ -16,6 +16,8 @@ Requires WRDS access. Run once; results are cached locally.
 """
 
 import os
+import builtins
+import getpass
 import wrds
 import pandas as pd
 from pathlib import Path
@@ -29,7 +31,17 @@ if _env_path.exists():
             os.environ.setdefault(_k.strip(), _v.strip())
 
 WRDS_USERNAME = os.getenv("WRDS_USERNAME", "vedantbhagat")
-WRDS_PASSWORD = os.getenv("WRDS_PASSWORD")
+WRDS_PASSWORD = os.getenv("WRDS_PASSWORD", "")
+
+_real_input = builtins.input
+
+def _auto_input(prompt=""):
+    if "username" in prompt.lower() and WRDS_USERNAME:
+        print(f"{prompt}{WRDS_USERNAME}")
+        return WRDS_USERNAME
+    return _real_input(prompt)
+
+builtins.input = _auto_input
 
 RAW_DIR = Path("data/raw")
 RAW_DIR.mkdir(parents=True, exist_ok=True)
