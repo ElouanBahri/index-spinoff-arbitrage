@@ -42,8 +42,7 @@ def clean_and_rename_bloomberg(input_path, output_path):
     
     for col, prefix in columns_to_strip.items():
         if col in df.columns:
-            df[col] = df[col].astype(str).str.replace(prefix, "", case=False, regex=False).str.strip()
-            
+            df[col] = df[col].astype(str).str.replace(prefix, "", case=False, regex=False).str.strip()   
     # Drop rows that are fully empty if any exist
     df.dropna(how='all', inplace=True)
     df.reset_index(drop=True, inplace=True)
