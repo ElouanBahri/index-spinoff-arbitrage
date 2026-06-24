@@ -60,8 +60,19 @@ print('Paths OK')
 events = pd.read_csv(CLEAN_DIR / 'spinoff_events_merged.csv',
                      parse_dates=['announce_date', 'effective_date',
                                   'sp500_start', 'sp500_end'])
-print(f'Spinoff events: {len(events)} rows')
-events.head()
+print(f'Spinoff events: {len(events)} rows, {events["effective_date"].min().year}–{events["effective_date"].max().year}')
+
+# %%
+# Events overview — all 30 spinoff events with key metrics
+overview_cols = ['parent_ticker', 'spinoff_ticker', 'effective_date',
+                 'parent_index_weight', 'forced_flow_usd', 'forced_flow_adv']
+overview = events[overview_cols].copy()
+overview['effective_date'] = overview['effective_date'].dt.strftime('%Y-%m-%d')
+overview['parent_index_weight'] = (overview['parent_index_weight'] * 100).map('{:.3f}%'.format)
+overview['forced_flow_usd'] = overview['forced_flow_usd'].map('${:,.0f}'.format)
+overview['forced_flow_adv'] = overview['forced_flow_adv'].map('{:.1f}x'.format)
+overview.columns = ['Parent', 'Spinoff', 'Effective Date', 'Index Wt', 'Forced Flow ($)', 'Flow / ADV']
+overview
 
 # %%
 # CRSP daily prices (parents + current S&P 500 constituents)
@@ -283,6 +294,15 @@ if len(all_windows):
 
 # %% [markdown]
 # ## 4. Passive AUM & Forced-Flow Feature
+#
+# **Hypothesis:** When a parent spins off a subsidiary, passive S&P 500 funds must
+# mechanically sell the spun-off shares (which are not in the index). The magnitude of
+# this forced selling is proportional to:
+#
+# $$\text{Forced Flow} = \text{Passive AUM} \times w_{\text{parent}}$$
+#
+# where $w_{\text{parent}}$ is the parent's weight in the S&P 500 just before the effective
+# date. We express this in ADV (average daily volume) days to make it comparable across names.
 
 # %%
 if passive_aum is not None:
@@ -335,6 +355,36 @@ if 'forced_flow_adv' in events.columns and events['forced_flow_adv'].notna().any
     plt.suptitle('Forced-Flow Feature Distributions', fontweight='bold')
     plt.tight_layout()
     plt.show()
+
+# %%
+# Forced-flow leaderboard — sorted bar chart for all 30 events
+if 'forced_flow_adv' in events.columns:
+    ff_sorted = events[['parent_ticker', 'spinoff_ticker', 'effective_date',
+                         'forced_flow_adv', 'forced_flow_usd']].copy()
+    ff_sorted['label'] = (ff_sorted['parent_ticker'] + ' → ' + ff_sorted['spinoff_ticker'].fillna('?')
+                          + '\n(' + ff_sorted['effective_date'].dt.strftime('%b %Y') + ')')
+    ff_sorted = ff_sorted.sort_values('forced_flow_adv')
+
+    colors = ['#d32f2f' if v >= 10 else '#1976d2' if v >= 5 else '#78909c'
+              for v in ff_sorted['forced_flow_adv']]
+
+    fig, ax = plt.subplots(figsize=(10, 11))
+    bars = ax.barh(ff_sorted['label'], ff_sorted['forced_flow_adv'], color=colors, alpha=0.85)
+    ax.axvline(5, color='orange', linestyle='--', lw=1, label='5× ADV threshold')
+    ax.axvline(10, color='red', linestyle='--', lw=1, label='10× ADV threshold')
+    ax.set_xlabel('Estimated Forced Flow (× ADV)', fontsize=12)
+    ax.set_title('Forced-Flow Intensity by Spinoff Event\n'
+                 'Passive S&P 500 AUM × Parent Index Weight ÷ 30-day ADV',
+                 fontweight='bold', fontsize=13)
+    ax.legend(fontsize=10)
+    for bar, val in zip(bars, ff_sorted['forced_flow_adv']):
+        ax.text(bar.get_width() + 0.2, bar.get_y() + bar.get_height() / 2,
+                f'{val:.1f}×', va='center', fontsize=8)
+    plt.tight_layout()
+    plt.show()
+    high = (ff_sorted['forced_flow_adv'] >= 10).sum()
+    print(f'Events with >10× ADV forced flow: {high}/{len(ff_sorted)}')
+    print(f'Events with >5× ADV forced flow:  {(ff_sorted["forced_flow_adv"] >= 5).sum()}/{len(ff_sorted)}')
 
 # %%
 # Correlation: does higher forced-flow predict worse post-event returns?
@@ -600,29 +650,74 @@ else:
     print('[!] Need parent CRSP price data — run: python repull_data.py')
 
 # %% [markdown]
-# ## 9. Summary — Key Findings for Signal Construction
-#
-# Fill in after running with full data:
+# ## 9. Summary — Key Findings & Candidate Feature Set
 
 # %%
-print('=== DATA COVERAGE ===')
-print(f"Spinoff events:               {len(events)}")
-print(f"Events with CRSP prices:      {events['has_price_data'].sum()} / {len(events)}")
-print(f"Events with forced-flow est:  {events.get('forced_flow_usd', pd.Series()).notna().sum()} / {len(events)}")
-print(f"CRSP daily rows:              {len(crsp):,}")
-print(f"Unique permnos in CRSP:       {crsp['permno'].nunique()}")
-print(f"S&P 500 constituent records:  {len(constituents):,}")
-print(f"Unique companies (permno):    {constituents[id_col].nunique()}")
+print('=' * 60)
+print('DATA COVERAGE')
+print('=' * 60)
+print(f"  Spinoff events (Bloomberg, 2020–2025):  {len(events)}")
+print(f"  Events with CRSP price data:            {events['has_price_data'].sum()} / {len(events)}")
+print(f"  Events with forced-flow estimates:      {events['forced_flow_usd'].notna().sum()} / {len(events)}")
+print(f"  CRSP daily rows (2010–present):         {len(crsp):,}")
+print(f"  Unique permnos in CRSP:                 {crsp['permno'].nunique()}")
+print(f"  S&P 500 member permnos (2010–present):  {constituents[id_col].nunique()}")
 if passive_aum is not None:
-    print(f"Passive AUM months:           {len(passive_aum)}")
-else:
-    print("Passive AUM:                  NOT YET AVAILABLE")
+    latest_aum = passive_aum.sort_values('date').iloc[-1]
+    print(f"  Passive AUM (latest):                   ${latest_aum['total_aum_billions']:.0f}B "
+          f"({latest_aum['date'].strftime('%b %Y')})")
 
 print()
-print('=== CANDIDATE SIGNALS ===')
-print('1. forced_flow_adv  — expected forced selling in days of ADV')
-print('2. parent_index_weight — parent weight in S&P 500 at spinoff')
-print('3. announce_lag_days — lead time from announcement to effective date')
-print('4. price_drop_at_spinoff — price change at effective date (ex-dividend style)')
-print('5. sp500_tenure_years — how long parent has been in index')
-print('6. spinoff_shares_per_parent — distribution ratio')
+print('=' * 60)
+print('FORCED-FLOW FEATURE SUMMARY')
+print('=' * 60)
+ff = events['forced_flow_adv'].dropna()
+ff_usd = events['forced_flow_usd'].dropna() / 1e9
+print(f"  Median forced flow:      {ff.median():.1f}× ADV  |  ${ff_usd.median():.1f}B")
+print(f"  Mean forced flow:        {ff.mean():.1f}× ADV  |  ${ff_usd.mean():.1f}B")
+print(f"  Max forced flow:         {ff.max():.1f}× ADV  ({events.loc[ff.idxmax(), 'parent_ticker']} → "
+      f"{events.loc[ff.idxmax(), 'spinoff_ticker']})")
+print(f"  Events >10× ADV:         {(ff >= 10).sum()} / {len(ff)}")
+print(f"  Events >5× ADV:          {(ff >= 5).sum()} / {len(ff)}")
+
+print()
+print('=' * 60)
+print('EVENT STUDY RESULTS')
+print('=' * 60)
+if len(all_windows):
+    post_20 = (all_windows[all_windows['t'].between(1, 20)]
+               .groupby(['parent_ticker', 'effective_date'])['ret_mkt_adj'].sum())
+    pre_10  = (all_windows[all_windows['t'].between(-10, -1)]
+               .groupby(['parent_ticker', 'effective_date'])['ret_mkt_adj'].sum())
+    t1, p1 = stats.ttest_1samp(post_20.dropna(), 0)
+    t2, p2 = stats.ttest_1samp(pre_10.dropna(), 0)
+    print(f"  Parents with price data:           {events['has_price_data'].sum()}")
+    print(f"  Avg CAR[+1,+20] (post-spinoff):   {post_20.mean()*100:+.2f}%  "
+          f"(t={t1:.2f}, p={p1:.3f})")
+    print(f"  Avg CAR[-10,-1] (pre-announcement):{pre_10.mean()*100:+.2f}%  "
+          f"(t={t2:.2f}, p={p2:.3f})")
+    print(f"  Significant post-event drift:      {'YES' if p1 < 0.05 else 'NO'} (α=0.05)")
+
+print()
+print('=' * 60)
+print('CANDIDATE FEATURE SET FOR SIGNAL MODEL')
+print('=' * 60)
+feature_rows = [
+    ('forced_flow_adv',          'Forced Flow (× ADV)',        'CORE — passive AUM × index weight ÷ ADV'),
+    ('forced_flow_usd',          'Forced Flow ($)',             'CORE — raw dollar selling pressure'),
+    ('parent_index_weight',      'Parent Index Weight',         'Driver of forced-flow magnitude'),
+    ('price_drop_at_spinoff',    'Price Drop at Effective Date','Proxy for spinoff value extraction'),
+    ('announce_lag_days',        'Announcement Lead (days)',    'Longer lag = more market pre-pricing'),
+    ('sp500_tenure_years',       'Parent Tenure in S&P 500',   'Deletion predictor: longer tenure → safer'),
+    ('spinoff_shares_per_parent','Distribution Ratio',         'Size of spinoff relative to parent'),
+]
+for col, name, desc in feature_rows:
+    avail = events[col].notna().sum() if col in events.columns else 0
+    print(f"  {name:<30s}  {avail:2d}/30  {desc}")
+
+print()
+print('NEXT STEPS')
+print('  1. Pull spun-off company (child) CRSP prices to measure short-side returns')
+print('  2. Fit deletion probability model: which parents exit S&P 500 within 1 yr?')
+print('  3. Build composite signal: forced_flow_adv + deletion_prob + announce_lag')
+print('  4. Backtest short spinoff / long S&P 500 futures, size by signal strength')
