@@ -1,31 +1,31 @@
-parent_name,parent_ticker,permno,gvkey,spinoff_name,spinoff_ticker,spinoff_ratio,announce_date,effective_date,company_name_wrds,ticker_wrds,cusip,sic,naics,sp500_start,sp500_end,still_active,in_sp500_at_spinoff
-McKesson Corp,MCK,10516,001722,PF2 SpinCo Inc,1784039D,11.4086: 1,2020-02-10,2020-03-10,,,,,,,,,False
-Howmet Aerospace Inc,HWM,14543,023167,Arconic Corp,ARNC,1 per 4,2024-10-30,2020-04-01,,,,,,,,,False
-RTX Corp,RTX,12431,005959,Carrier Global Corp,CARR,1 per 1,2018-11-26,2020-04-03,TRANE TECHNOLOGIES PLC,TT,G8994E103,3585,333415,2010-11-17,2026-06-17,True,True
-RTX Corp,RTX,12431,005959,Otis Worldwide Corp,OTIS,1 per 2,2018-11-26,2020-04-03,TRANE TECHNOLOGIES PLC,TT,G8994E103,3585,333415,2010-11-17,2026-06-17,True,True
-Ecolab Inc,ECL,22513,027712,ChampionX Holding Inc,1695496D,24.6667: 1,2019-02-04,2020-06-04,,,,,,,,,False
-Occidental Petroleum Corp,OXY,26144,331717,Occidental Petroleum Corp,OXY/WS,1 per 8,2020-06-29,2020-07-02,,,,,,,,,False
-Fortive Corp,FTV,16162,027669,Vontier Corp,VNT,2 per 5,2019-09-04,2020-10-09,,,,,,,,,False
-Pfizer Inc,PFE,21901,186949,Viatris Inc,VTRS,.1241  : 1,2020-06-29,2020-11-17,,,,,,,,,False
-Merck & Co Inc,MRK,22752,007257,Organon & Co,OGN,1 per 10,2020-02-05,2021-06-03,,,,,,,,,False
-DTE Energy Co,DTE,11953,014180,DT Midstream Inc,DTM,1 per 2,2020-10-27,2021-07-01,,,,,,,,,False
-International Paper Co,IP,23136,,Sylvamo Corp,SLVM,1 per 11,2020-12-03,2021-10-01,,,,,,,,,False
-Dell Technologies Inc,DELL,18144,328795,VMware Inc,VMW,.4406  : 1,2021-04-14,2021-11-02,,,,,,,,,False
-International Business Machine,IBM,12490,006066,Kyndryl Holdings Inc,KD,1 per 5,2020-10-08,2021-11-04,,,,,,,,,False
-Realty Income Corp,O,80649,030418,Orion Properties Inc,ONL,1 per 10,2021-05-28,2021-11-15,,,,,,,,,False
-Exelon Corp,EXC,88863,141277,Constellation Energy Corp,CEG,1 per 3,2021-03-03,2022-02-02,,,,,,,,,False
-Zimmer Biomet Holdings Inc,ZBH,89081,,Zimvie Inc,ZIMV,1 per 10,2021-02-05,2022-03-01,,,,,,,,,False
-Becton Dickinson and Co,BDX,20521,,Embecta Corp,EMBC,1 per 5,2021-05-06,2022-04-01,,,,,,,,,False
-AT&T Inc,T,10401,001581,Warnermedia Holdings Inc,2020368D,1 per 1,2021-05-17,2022-04-11,,,,,,,,,False
-General Electric Co,GE,12060,005047,GE HealthCare Technologies Inc,GEHC,1 per 3,2021-11-09,2023-01-04,,,,,,,,,False
-Labcorp Holdings Inc,LH,80644,031756,Fortrea Holdings Inc,FTRE,1 per 1,2022-07-28,2023-07-03,,,,,,,,,False
-Danaher Corp,DHR,70377,,EAS Segment,VLTO,1 per 3,2022-09-14,2023-10-02,,,,,,,,,False
-Cummins Inc,CMI,21151,003652,Atmus Filtration Technologies Inc,ATMU,12.0298: 1,2023-11-02,2024-03-08,,,,,,,,,False
-3M Co,MMM,22580,038400,Solventum Corp,SOLV,1 per 4,2022-07-26,2024-04-01,,,,,,,,,False
-General Electric Co,GE,12060,005047,GE Renewable Energy & Power & Digital business,GEV,1 per 4,2021-11-09,2024-04-02,,,,,,,,,False
-Jacobs Solutions Inc,J,76166,021659,Amentum Holdings Inc,AMTM,1 per 1,2023-11-23,2024-09-30,,,,,,,,,False
-Lennar Corp,LEN/B,75395,,Millrose Properties Inc,MRP,1 per 2,2025-01-10,2025-01-21,,,,,,,,,False
-Western Digital Corp,WDC,64536,,Sandisk Corp,SNDK,1 per 3,2023-10-30,2025-02-24,,,,,,,,,False
-Jacobs Solutions Inc,J,76166,021659,Amentum Holdings Inc,AMTM,.0608  : 1,2025-04-30,2025-05-16,,,,,,,,,False
-Fortive Corp,FTV,16162,027669,Ralliant Corp,RAL,1 per 3,2024-09-06,2025-06-30,,,,,,,,,False
-Honeywell International Inc,HON,10145,001300,Solstice Advanced Materials Inc,SOLS,1 per 4,2024-10-08,2025-10-30,,,,,,,,,False
+parent_name,parent_ticker,permno,gvkey,spinoff_name,spinoff_ticker,spinoff_ratio,announce_date,effective_date,company_name_wrds,ticker_wrds,cusip,sic,naics,sp500_start,sp500_end,still_active,in_sp500_at_spinoff,parent_mktcap_usd,sp500_total_mktcap_usd,parent_index_weight,passive_aum_usd,forced_flow_usd,parent_adv_usd,forced_flow_adv
+McKesson Corp,MCK,10516,001722,PF2 SpinCo Inc,1784039D,11.4086: 1,2020-02-10,2020-03-10,,,,,,,,,False,,,,,,,
+Howmet Aerospace Inc,HWM,14543,023167,Arconic Corp,ARNC,1 per 4,2024-10-30,2020-04-01,,,,,,,,,False,,,,,,,
+RTX Corp,RTX,12431,005959,Carrier Global Corp,CARR,1 per 1,2018-11-26,2020-04-03,TRANE TECHNOLOGIES PLC,TT,G8994E103,3585,333415,2010-11-17,2026-06-17,True,True,19753906860.0,9863745786876.281,0.0020026780177447986,,,261253480.97013435,
+RTX Corp,RTX,12431,005959,Otis Worldwide Corp,OTIS,1 per 2,2018-11-26,2020-04-03,TRANE TECHNOLOGIES PLC,TT,G8994E103,3585,333415,2010-11-17,2026-06-17,True,True,19753906860.0,9863745786876.281,0.0020026780177447986,,,261253480.97013435,
+Ecolab Inc,ECL,22513,027712,ChampionX Holding Inc,1695496D,24.6667: 1,2019-02-04,2020-06-04,,,,,,,,,False,,,,,,,
+Occidental Petroleum Corp,OXY,26144,331717,Occidental Petroleum Corp,OXY/WS,1 per 8,2020-06-29,2020-07-02,,,,,,,,,False,,,,,,,
+Fortive Corp,FTV,16162,027669,Vontier Corp,VNT,2 per 5,2019-09-04,2020-10-09,,,,,,,,,False,,,,,,,
+Pfizer Inc,PFE,21901,186949,Viatris Inc,VTRS,.1241  : 1,2020-06-29,2020-11-17,,,,,,,,,False,,,,,,,
+Merck & Co Inc,MRK,22752,007257,Organon & Co,OGN,1 per 10,2020-02-05,2021-06-03,,,,,,,,,False,,,,,,,
+DTE Energy Co,DTE,11953,014180,DT Midstream Inc,DTM,1 per 2,2020-10-27,2021-07-01,,,,,,,,,False,,,,,,,
+International Paper Co,IP,23136,,Sylvamo Corp,SLVM,1 per 11,2020-12-03,2021-10-01,,,,,,,,,False,,,,,,,
+Dell Technologies Inc,DELL,18144,328795,VMware Inc,VMW,.4406  : 1,2021-04-14,2021-11-02,,,,,,,,,False,,,,,,,
+International Business Machine,IBM,12490,006066,Kyndryl Holdings Inc,KD,1 per 5,2020-10-08,2021-11-04,,,,,,,,,False,,,,,,,
+Realty Income Corp,O,80649,030418,Orion Properties Inc,ONL,1 per 10,2021-05-28,2021-11-15,,,,,,,,,False,,,,,,,
+Exelon Corp,EXC,88863,141277,Constellation Energy Corp,CEG,1 per 3,2021-03-03,2022-02-02,,,,,,,,,False,,,,,,,
+Zimmer Biomet Holdings Inc,ZBH,89081,,Zimvie Inc,ZIMV,1 per 10,2021-02-05,2022-03-01,,,,,,,,,False,,,,,,,
+Becton Dickinson and Co,BDX,20521,,Embecta Corp,EMBC,1 per 5,2021-05-06,2022-04-01,,,,,,,,,False,,,,,,,
+AT&T Inc,T,10401,001581,Warnermedia Holdings Inc,2020368D,1 per 1,2021-05-17,2022-04-11,,,,,,,,,False,,,,,,,
+General Electric Co,GE,12060,005047,GE HealthCare Technologies Inc,GEHC,1 per 3,2021-11-09,2023-01-04,,,,,,,,,False,,,,,,,
+Labcorp Holdings Inc,LH,80644,031756,Fortrea Holdings Inc,FTRE,1 per 1,2022-07-28,2023-07-03,,,,,,,,,False,,,,,,,
+Danaher Corp,DHR,70377,,EAS Segment,VLTO,1 per 3,2022-09-14,2023-10-02,,,,,,,,,False,,,,,,,
+Cummins Inc,CMI,21151,003652,Atmus Filtration Technologies Inc,ATMU,12.0298: 1,2023-11-02,2024-03-08,,,,,,,,,False,,,,,,,
+3M Co,MMM,22580,038400,Solventum Corp,SOLV,1 per 4,2022-07-26,2024-04-01,,,,,,,,,False,,,,,,,
+General Electric Co,GE,12060,005047,GE Renewable Energy & Power & Digital business,GEV,1 per 4,2021-11-09,2024-04-02,,,,,,,,,False,,,,,,,
+Jacobs Solutions Inc,J,76166,021659,Amentum Holdings Inc,AMTM,1 per 1,2023-11-23,2024-09-30,,,,,,,,,False,,,,,,,
+Lennar Corp,LEN/B,75395,,Millrose Properties Inc,MRP,1 per 2,2025-01-10,2025-01-21,,,,,,,,,False,,,,,,,
+Western Digital Corp,WDC,64536,,Sandisk Corp,SNDK,1 per 3,2023-10-30,2025-02-24,,,,,,,,,False,,,,,,,
+Jacobs Solutions Inc,J,76166,021659,Amentum Holdings Inc,AMTM,.0608  : 1,2025-04-30,2025-05-16,,,,,,,,,False,,,,,,,
+Fortive Corp,FTV,16162,027669,Ralliant Corp,RAL,1 per 3,2024-09-06,2025-06-30,,,,,,,,,False,,,,,,,
+Honeywell International Inc,HON,10145,001300,Solstice Advanced Materials Inc,SOLS,1 per 4,2024-10-08,2025-10-30,,,,,,,,,False,,,,,,,
