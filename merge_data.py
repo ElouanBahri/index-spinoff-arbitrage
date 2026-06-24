@@ -28,9 +28,21 @@ Flags:
 """
 
 import argparse
+import os
 import pandas as pd
 import numpy as np
 from pathlib import Path
+
+_env_path = Path(__file__).parent / ".env"
+if _env_path.exists():
+    for _line in _env_path.read_text().splitlines():
+        _line = _line.strip()
+        if _line and not _line.startswith("#") and "=" in _line:
+            _k, _v = _line.split("=", 1)
+            os.environ.setdefault(_k.strip(), _v.strip())
+
+WRDS_USERNAME = os.getenv("WRDS_USERNAME", "vedantbhagat")
+WRDS_PASSWORD = os.getenv("WRDS_PASSWORD")
 
 RAW_DIR = Path("data/raw")
 CLEAN_DIR = Path("data/clean")
@@ -105,7 +117,7 @@ def pull_missing_crsp(missing_permnos: list[int], start_date: str = "2019-01-01"
     """Connect to WRDS and pull daily CRSP data for permnos not in local parquet."""
     import wrds
 
-    db = wrds.Connection()
+    db = wrds.Connection(wrds_username=WRDS_USERNAME, wrds_password=WRDS_PASSWORD)
     permno_str = ",".join(str(p) for p in missing_permnos)
     end_date = pd.Timestamp.today().strftime("%Y-%m-%d")
 

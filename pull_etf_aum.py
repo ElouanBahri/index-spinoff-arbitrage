@@ -15,9 +15,21 @@ Output: data/raw/sp500_passive_aum.parquet
 Requires WRDS access. Run once; results are cached locally.
 """
 
+import os
 import wrds
 import pandas as pd
 from pathlib import Path
+
+_env_path = Path(__file__).parent / ".env"
+if _env_path.exists():
+    for _line in _env_path.read_text().splitlines():
+        _line = _line.strip()
+        if _line and not _line.startswith("#") and "=" in _line:
+            _k, _v = _line.split("=", 1)
+            os.environ.setdefault(_k.strip(), _v.strip())
+
+WRDS_USERNAME = os.getenv("WRDS_USERNAME", "vedantbhagat")
+WRDS_PASSWORD = os.getenv("WRDS_PASSWORD")
 
 RAW_DIR = Path("data/raw")
 RAW_DIR.mkdir(parents=True, exist_ok=True)
@@ -182,7 +194,7 @@ def build_aggregate_aum(monthly: pd.DataFrame) -> pd.DataFrame:
 
 
 def main():
-    db = wrds.Connection()
+    db = wrds.Connection(wrds_username=WRDS_USERNAME, wrds_password=WRDS_PASSWORD)
 
     print("Inspecting CRSP Mutual Fund schema...")
     inspect_mf_schema(db)
