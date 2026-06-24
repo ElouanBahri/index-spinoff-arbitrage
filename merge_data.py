@@ -46,7 +46,8 @@ if _env_path.exists():
 WRDS_USERNAME = os.getenv("WRDS_USERNAME", "vedantbhagat")
 WRDS_PASSWORD = os.getenv("WRDS_PASSWORD", "")
 
-_real_input = builtins.input
+_real_input   = builtins.input
+_real_getpass = getpass.getpass
 
 def _auto_input(prompt=""):
     if "username" in prompt.lower() and WRDS_USERNAME:
@@ -54,7 +55,13 @@ def _auto_input(prompt=""):
         return WRDS_USERNAME
     return _real_input(prompt)
 
-builtins.input = _auto_input
+def _auto_getpass(prompt="Password: ", stream=None):
+    if WRDS_PASSWORD:
+        return WRDS_PASSWORD
+    return _real_getpass(prompt, stream=stream)
+
+builtins.input  = _auto_input
+getpass.getpass = _auto_getpass
 
 RAW_DIR = Path("data/raw")
 CLEAN_DIR = Path("data/clean")
@@ -100,10 +107,13 @@ def load_ccm_link() -> pd.DataFrame:
 
 
 def load_constituents() -> pd.DataFrame:
-    return pd.read_parquet(RAW_DIR / "sp500_constituents_pit.parquet")[
-        ["gvkey", "start_date", "end_date", "still_active",
-         "company_name", "ticker", "cusip", "sic", "naics"]
-    ]
+    df = pd.read_parquet(RAW_DIR / "sp500_constituents_pit.parquet")
+    # Support both old gvkey-based schema and new permno-based schema (msp500list)
+    keep = ["start_date", "end_date", "still_active"]
+    for col in ["permno", "gvkey", "company_name", "ticker", "naics", "cusip", "sic"]:
+        if col in df.columns:
+            keep.append(col)
+    return df[keep].copy()
 
 
 def load_crsp_daily() -> pd.DataFrame:
@@ -157,23 +167,26 @@ def build_events_table(events: pd.DataFrame, ccm: pd.DataFrame,
                         constituents: pd.DataFrame) -> pd.DataFrame:
     """Join spinoff events with WRDS identifiers and S&P 500 membership dates."""
 
+    # Always pull gvkey from CCM for optional Compustat joins downstream
     merged = events.merge(ccm, on="permno", how="left")
 
-    const_cols = constituents[["gvkey", "start_date", "end_date", "still_active",
-                                "company_name", "ticker", "cusip", "sic", "naics"]].copy()
-    const_cols = const_cols.rename(columns={
-        "start_date": "sp500_start",
-        "end_date": "sp500_end",
-        "company_name": "company_name_wrds",
-        "ticker": "ticker_wrds",
-    })
+    # Constituent data may be permno-based (msp500list) or gvkey-based (old schema)
+    use_permno = "permno" in constituents.columns
+    join_key   = "permno" if use_permno else "gvkey"
 
-    joined = merged.merge(const_cols, on="gvkey", how="left")
+    const_cols = constituents.rename(columns={
+        "start_date":    "sp500_start",
+        "end_date":      "sp500_end",
+        "company_name":  "company_name_wrds",
+        "ticker":        "ticker_wrds",
+    }).copy()
+
+    joined = merged.merge(const_cols, on=join_key, how="left")
 
     has_const = joined["sp500_start"].notna()
     in_window = has_const & (
         (joined["sp500_start"] <= joined["effective_date"]) &
-        (joined["sp500_end"] >= joined["effective_date"])
+        (joined["sp500_end"]   >= joined["effective_date"])
     )
     joined["in_sp500_at_spinoff"] = in_window
 
@@ -194,9 +207,15 @@ def build_events_table(events: pd.DataFrame, ccm: pd.DataFrame,
         "parent_name", "parent_ticker", "permno", "gvkey",
         "spinoff_name", "spinoff_ticker", "spinoff_ratio",
         "announce_date", "effective_date",
-        "company_name_wrds", "ticker_wrds", "cusip", "sic", "naics",
+        "company_name_wrds", "ticker_wrds",
         "sp500_start", "sp500_end", "still_active", "in_sp500_at_spinoff",
     ]
+    # Only keep columns that actually exist (schema may vary)
+    col_order = [c for c in col_order if c in result.columns]
+    for extra in ["naics", "cusip", "sic"]:
+        if extra in result.columns:
+            col_order.append(extra)
+
     return result[col_order].sort_values("effective_date").reset_index(drop=True)
 
 
@@ -422,7 +441,8 @@ def main(pull_crsp: bool = False):
 
     print("\nBuilding events table...")
     events_merged = build_events_table(events, ccm, constituents)
-    print(f"  {events_merged['gvkey'].notna().sum()}/{len(events_merged)} events matched to WRDS gvkey")
+    if "gvkey" in events_merged.columns:
+        print(f"  {events_merged['gvkey'].notna().sum()}/{len(events_merged)} events matched to WRDS gvkey")
     print(f"  {events_merged['in_sp500_at_spinoff'].sum()}/{len(events_merged)} parents confirmed in S&P 500 at spinoff date")
 
     print("\nComputing forced-flow features...")

@@ -33,7 +33,8 @@ if _env_path.exists():
 WRDS_USERNAME = os.getenv("WRDS_USERNAME", "vedantbhagat")
 WRDS_PASSWORD = os.getenv("WRDS_PASSWORD", "")
 
-_real_input = builtins.input
+_real_input   = builtins.input
+_real_getpass = getpass.getpass
 
 def _auto_input(prompt=""):
     if "username" in prompt.lower() and WRDS_USERNAME:
@@ -41,7 +42,13 @@ def _auto_input(prompt=""):
         return WRDS_USERNAME
     return _real_input(prompt)
 
-builtins.input = _auto_input
+def _auto_getpass(prompt="Password: ", stream=None):
+    if WRDS_PASSWORD:
+        return WRDS_PASSWORD
+    return _real_getpass(prompt, stream=stream)
+
+builtins.input  = _auto_input
+getpass.getpass = _auto_getpass
 
 RAW_DIR = Path("data/raw")
 RAW_DIR.mkdir(parents=True, exist_ok=True)
