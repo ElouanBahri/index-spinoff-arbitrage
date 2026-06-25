@@ -1,1 +1,10 @@
 .env
+.DS_Store
+__pycache__/
+*.pyc
+
+# Large CRSP/Compustat data files — regenerate with: python repull_data.py
+data/raw/crsp_daily.parquet
+data/raw/ccm_link.parquet
+data/raw/crsp_index_returns.parquet
+data/raw/sp500_passive_funds.parquet
