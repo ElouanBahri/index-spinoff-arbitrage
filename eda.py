@@ -725,3 +725,4 @@ print('  1. Deletion probability model: logistic regression on parent fundamenta
 print('  2. Composite signal: forced_flow_adv × (1 − deletion_prob_parent)')
 print('  3. Backtest: short child at t=0 close, long SPY futures, size by signal')
 print('  4. Exits: child added to S&P 500, 21/42/63-day stops, stop-loss at +10%')
+
