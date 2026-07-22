@@ -11,6 +11,7 @@ dependencies:
   - numpy>=2.2
   - pandas>=3.0
   - scikit-learn>=1.6
+  - scipy
   - yaml
   - fastapi>=0.135
   - matplotlib
@@ -18,5 +19,9 @@ dependencies:
   - xgboost>=3.2.0
   - pip
   - seaborn>=0.13.2
+  - jupyterlab
+  - ipykernel
+  - jupytext
   - pip:
     - fastapi[standard]>=0.135
+    - wrds

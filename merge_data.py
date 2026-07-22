@@ -17,7 +17,7 @@ Outputs:
                                               ±90 days around each spinoff date
 
 Run order:
-  1. python pull_data.ipynb           (pulls CRSP/Compustat via WRDS — already done)
+  1. python repull_data.py            (pulls CRSP/Compustat via WRDS)
   2. python pull_etf_aum.py           (pulls passive fund AUM via WRDS)
   3. python merge_data.py             (combine; add --pull-crsp to also fetch parent prices)
 
@@ -43,7 +43,7 @@ if _env_path.exists():
             _k, _v = _line.split("=", 1)
             os.environ.setdefault(_k.strip(), _v.strip())
 
-WRDS_USERNAME = os.getenv("WRDS_USERNAME", "vedantbhagat")
+WRDS_USERNAME = os.getenv("WRDS_USERNAME", "")
 WRDS_PASSWORD = os.getenv("WRDS_PASSWORD", "")
 
 _real_input   = builtins.input

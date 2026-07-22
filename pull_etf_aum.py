@@ -30,7 +30,7 @@ if _env_path.exists():
             _k, _v = _line.split("=", 1)
             os.environ.setdefault(_k.strip(), _v.strip())
 
-WRDS_USERNAME = os.getenv("WRDS_USERNAME", "vedantbhagat")
+WRDS_USERNAME = os.getenv("WRDS_USERNAME", "")
 WRDS_PASSWORD = os.getenv("WRDS_PASSWORD", "")
 
 _real_input   = builtins.input

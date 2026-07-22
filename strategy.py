@@ -50,7 +50,7 @@ from pathlib import Path
 from sklearn.linear_model import LinearRegression, Lasso, Ridge, LassoCV, RidgeCV
 from sklearn.preprocessing import PolynomialFeatures, StandardScaler
 from sklearn.pipeline import Pipeline
-from sklearn.model_selection import LeaveOneOut, cross_val_score
+from sklearn.model_selection import LeaveOneOut
 from sklearn.metrics import r2_score
 import statsmodels.api as sm
 
@@ -488,10 +488,17 @@ print(f"\nTarget stats:  mean={y.mean():.2f}%  std={y.std():.2f}%  "
 
 # %%
 # --- Utility: LOO R² ---
+# R² is undefined on a single held-out point, so per-fold scoring (e.g.
+# cross_val_score(..., scoring='r2') under LeaveOneOut) returns NaN for every
+# fold. Instead, collect the pooled out-of-fold predictions across all folds
+# and compute one R² at the end.
 def loo_r2(model, X, y):
     loo = LeaveOneOut()
-    preds = cross_val_score(model, X, y, cv=loo, scoring='r2')
-    return preds.mean()
+    preds = np.empty_like(y, dtype=float)
+    for train_idx, test_idx in loo.split(X):
+        model.fit(X[train_idx], y[train_idx])
+        preds[test_idx] = model.predict(X[test_idx])
+    return r2_score(y, preds)
 
 # %% [markdown]
 # ### 7.1 Simple OLS — `short_pnl_21d ~ forced_flow_adv`
