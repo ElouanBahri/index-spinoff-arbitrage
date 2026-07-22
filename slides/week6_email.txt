@@ -1,0 +1,13 @@
+Hi Yuanyi,
+
+I hope you are doing well.
+
+I am sharing our Week 6 slides for your review. Following up on last week's finding that prob_included correlates with 252-day parent CAR (r = 0.67, p = 0.004) and improves position sizing (Sharpe 0.69 to 1.25), we tightened up the classification tree and tested whether it can add further value on top of sizing.
+
+- Tree validation - we refit the tree using nested leave-one-out cross-validation (selection and scoring each done without ever seeing the label being predicted) and added a floor requiring at least 3 leaves, so the tree is structurally able to predict "underperform" rather than collapsing to two classes. This raised nested accuracy from 38% (majority-class baseline) to 44%, and "underperform" recall from 0% in last week's 2-leaf tree to 40%. forced_flow_adv remains the dominant driver of the splits (importance 0.52) versus prob_included (0.29) and beta (0.19), with log_child_mktcap contributing nothing.
+- Tree tilt on sizing - rather than replacing the prob_included sizing rule, we used the tree's nested (leakage-free) predicted bucket for each event as a small multiplicative tilt on top of it: x0.7 for underperform, x1.0 for middle, x1.3 for outperform (hand-chosen, not fit). This nudged the Sharpe ratio from 1.25 to 1.29 (mean 252-day return 23.4% to 23.5%, volatility 18.8% to 18.2%).
+
+As before, n = 16 events, so we're reading this as a hypothesis to keep testing rather than a validated strategy - the prob_included-weighted book alone (1.25) still has the stronger evidence, and the tree tilt (1.29) is a documented next lead rather than an upgrade we'd commit capital to yet.
+
+Best regards,
+Elouan Bahri

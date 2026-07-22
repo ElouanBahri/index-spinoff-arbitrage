@@ -1,0 +1,173 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Week 6 — How the Tree Works</title>
+<style>
+  @page { size: 10in 5.625in; margin: 0; }
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    width: 960px; height: 540px;
+    background: #0b1220;
+    font-family: -apple-system, "Segoe UI", Helvetica, Arial, sans-serif;
+    color: #e8ecf3;
+    overflow: hidden;
+  }
+  .mono { font-family: "SF Mono", "Fira Code", Menlo, Consolas, monospace; }
+  .slide { width: 960px; height: 540px; padding: 22px 30px 16px 30px; position: relative; }
+  .kicker { font-size: 10px; letter-spacing: 1.6px; font-weight: 700; color: #4fd8ae; text-transform: uppercase; }
+  .title { font-size: 23px; font-weight: 700; color: #f6f8fb; margin: 4px 0 0 0; line-height: 1.25; max-width: 660px; }
+  .headline-row { display: flex; justify-content: space-between; align-items: flex-start; }
+  .headline-stat { text-align: right; flex-shrink: 0; padding-left: 16px; }
+  .headline-stat .num { font-size: 34px; font-weight: 800; color: #4fd8ae; line-height: 1; }
+  .headline-stat .cap { font-size: 9px; color: #8a96ab; margin-top: 4px; max-width: 220px; line-height: 1.4; }
+  .intro { font-size: 11.5px; color: #9aa7bd; margin-top: 8px; line-height: 1.5; max-width: 920px; }
+  code.k { font-family: "SF Mono", Menlo, Consolas, monospace; background: #1b2740; border: 1px solid #2a3a5c;
+    color: #7fe3c4; padding: 1px 5px; border-radius: 4px; font-size: 10.5px; }
+  hr.rule { border: none; border-top: 1px solid #202b42; margin: 10px 0 12px 0; }
+  .panels { display: flex; gap: 16px; }
+  .panel { flex: 1; background: #111a2c; border: 1px solid #24304a; border-radius: 8px; padding: 13px 15px; }
+  .panel-head { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 9px; }
+  .panel-title { font-size: 11px; font-weight: 700; letter-spacing: 0.6px; color: #cdd6e4; text-transform: uppercase; max-width: 300px; line-height: 1.35; }
+  .badge { font-size: 8px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase; padding: 3px 7px;
+    border-radius: 20px; white-space: nowrap; flex-shrink: 0; }
+  .badge.green { background: #0f2e22; color: #46d99b; border: 1px solid #1f4d3a; }
+  .bullet { font-size: 10.5px; color: #b7c1d4; line-height: 1.45; margin-bottom: 7px; padding-left: 12px; position: relative; }
+  .bullet::before { content: "—"; position: absolute; left: 0; color: #445071; }
+  .bullet b { color: #e8ecf3; }
+  .code-block { background: #0c1424; border: 1px solid #223050; border-radius: 6px; padding: 9px 11px;
+    font-size: 9.3px; line-height: 1.55; color: #9fb0c9; margin: 6px 0 9px 0; }
+  .code-block .c1 { color: #4fd8ae; }
+  .code-block .c2 { color: #e3b23c; }
+  .tree-block { background: #0c1424; border: 1px solid #223050; border-radius: 6px; padding: 7px 10px;
+    font-size: 8.7px; line-height: 1.42; color: #b7c1d4; margin: 5px 0 7px 0; white-space: pre; }
+  .tree-block .feat { color: #7fe3c4; }
+  .tree-block .leaf { color: #e3b23c; font-weight: 700; }
+  .tree-block .leaf.under { color: #f0716f; }
+  .stat-row { display: flex; gap: 8px; margin-bottom: 9px; }
+  .stat-tile { flex: 1; background: #0d1729; border: 1px solid #223050; border-radius: 6px; padding: 8px 9px; }
+  .stat-tile .lbl { font-size: 7.5px; color: #7d8aa3; letter-spacing: 0.4px; text-transform: uppercase; }
+  .stat-tile .val { font-size: 19px; font-weight: 800; margin-top: 2px; }
+  .stat-tile .val.grey { color: #8a96ab; }
+  .stat-tile .val.teal { color: #4fd8ae; }
+  .imp-row { display: flex; align-items: center; gap: 7px; margin: 3px 0; font-size: 9px; }
+  .imp-label { width: 100px; color: #9aa7bd; flex-shrink: 0; }
+  .imp-track { flex: 1; background: #182338; border-radius: 3px; height: 6px; position: relative; overflow: hidden; }
+  .imp-fill { height: 100%; border-radius: 3px; background: #4fd8ae; }
+  .imp-val { width: 28px; text-align: right; font-weight: 700; color: #cdd6e4; }
+  .cm-wrap { display: flex; gap: 9px; align-items: flex-start; margin-top: 6px; }
+  table.cm { border-collapse: collapse; font-size: 8px; }
+  table.cm th { color: #7d8aa3; font-weight: 600; padding: 2px 5px; text-align: center; }
+  table.cm td { color: #cdd6e4; padding: 2px 5px; text-align: center; border: 1px solid #223050; background: #0d1729; }
+  table.cm td.diag { color: #4fd8ae; font-weight: 700; background: #0f2318; }
+  table.cm th.rowh { color: #9aa7bd; text-align: right; padding-right: 6px; }
+  .cm-note { font-size: 8.6px; color: #9aa7bd; line-height: 1.42; max-width: 210px; }
+  .footer { position: absolute; left: 30px; right: 30px; bottom: 14px; background: #131c2e; border: 1px solid #2a3a5c;
+    border-left: 3px solid #4fd8ae; border-radius: 6px; padding: 8px 12px; display: flex; gap: 10px; align-items: flex-start; }
+  .footer .pill { font-size: 9px; font-weight: 700; color: #4fd8ae; letter-spacing: 0.4px; background: #0f2e22;
+    border: 1px solid #1f4d3a; border-radius: 4px; padding: 2px 7px; flex-shrink: 0; margin-top: 1px; }
+  .footer .txt { font-size: 9.7px; color: #a9b3c6; line-height: 1.5; }
+  .footer .txt b { color: #d5dbe8; }
+</style>
+</head>
+<body>
+<div class="slide">
+
+  <div class="headline-row">
+    <div>
+      <div class="kicker">WEEK 6 — SPINOFF ARBITRAGE PROJECT &middot; 1 OF 2</div>
+      <div class="title">How the Classification Tree Works</div>
+    </div>
+    <div class="headline-stat">
+      <div class="num">44%</div>
+      <div class="cap">nested LOO-CV accuracy, leakage-free &middot; vs. 38% majority-class baseline</div>
+    </div>
+  </div>
+
+  <div class="intro">
+    The tree predicts which tercile of the 252d parent CAR distribution an event lands in —
+    <code class="k">underperform</code> / <code class="k">middle</code> / <code class="k">outperform</code> —
+    from four features: <code class="k">prob_included</code>, <code class="k">forced_flow_adv</code>,
+    <code class="k">log_child_mktcap</code>, <code class="k">beta</code>. Selection and scoring both use nested
+    LOO-CV so no decision ever sees the label it's predicting. n = 16 events.
+  </div>
+
+  <hr class="rule">
+
+  <div class="panels">
+
+    <div class="panel" style="flex: 0.95;">
+      <div class="panel-head">
+        <div class="panel-title">How It's Fit: Nested LOO-CV + a 3-Leaf Floor</div>
+        <div class="badge green">Leakage-Free</div>
+      </div>
+      <div class="code-block">
+        for each held-out event (outer LOO):<br>
+        &nbsp;&nbsp;grow full tree on the other 15 &rarr; candidate <span class="c2">ccp_alpha</span>s<br>
+        &nbsp;&nbsp;keep only alphas whose tree has &ge; <span class="c1">3 leaves</span><br>
+        &nbsp;&nbsp;&nbsp;&nbsp;(a 2-leaf tree can't output a 3rd class — floor makes<br>
+        &nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"underperform" structurally reachable)<br>
+        &nbsp;&nbsp;inner LOO over those 15 picks the best-scoring alpha<br>
+        &nbsp;&nbsp;refit on all 15 &rarr; predict the held-out event
+      </div>
+      <div class="bullet">Every outer fold picked <code class="k" style="font-size:9px;">alpha=0</code> — at n=16, the
+        &ge;3-leaf floor already excludes every more-pruned candidate, so the search confirms the full, unconstrained
+        tree is the only option that qualifies.</div>
+      <div class="stat-row">
+        <div class="stat-tile"><div class="lbl">Majority baseline</div><div class="val grey">38%</div></div>
+        <div class="stat-tile"><div class="lbl">Nested LOO accuracy</div><div class="val teal">44%</div></div>
+      </div>
+      <div class="bullet" style="margin-bottom:0;">"Underperform" recall: <b style="color:#f0716f">0%</b> in last week's
+        2-leaf tree &rarr; <b style="color:#4fd8ae">40%</b> now — the floor is what makes flagging the downside case
+        possible at all.</div>
+    </div>
+
+    <div class="panel" style="flex: 1.05;">
+      <div class="panel-head" style="margin-bottom: 6px;">
+        <div class="panel-title">The Learned Tree (Fit on All 16 Events)</div>
+        <div class="badge green">Depth 3 &middot; 6 Leaves</div>
+      </div>
+      <div class="tree-block">├─ <span class="feat">forced_flow_adv</span> ≤ 7.43
+│   ├─ <span class="feat">prob_included</span> ≤ 0.62
+│   │   ├─ <span class="feat">beta</span> ≤ 0.98 → <span class="leaf">middle</span>
+│   │   └─ <span class="feat">beta</span> &gt; 0.98 → <span class="leaf under">underperform</span>
+│   └─ <span class="feat">prob_included</span> &gt; 0.62 → <span class="leaf">middle</span>
+└─ <span class="feat">forced_flow_adv</span> &gt; 7.43
+    ├─ <span class="feat">prob_included</span> ≤ 0.36 → <span class="leaf under">underperform</span>
+    └─ <span class="feat">prob_included</span> &gt; 0.36
+        ├─ <span class="feat">forced_flow_adv</span> ≤ 18.35 → <span class="leaf" style="color:#4fd8ae;">outperform</span>
+        └─ <span class="feat">forced_flow_adv</span> &gt; 18.35 → <span class="leaf under">underperform</span></div>
+
+      <div class="imp-row"><div class="imp-label">forced_flow_adv</div><div class="imp-track"><div class="imp-fill" style="width:87%;"></div></div><div class="imp-val">.52</div></div>
+      <div class="imp-row"><div class="imp-label">prob_included</div><div class="imp-track"><div class="imp-fill" style="width:48%; background:#7fe3c4;"></div></div><div class="imp-val">.29</div></div>
+      <div class="imp-row"><div class="imp-label">beta</div><div class="imp-track"><div class="imp-fill" style="width:32%; background:#5f7ba6;"></div></div><div class="imp-val">.19</div></div>
+      <div class="imp-row"><div class="imp-label">log_child_mktcap</div><div class="imp-track"><div class="imp-fill" style="width:1%; background:#3a4a6b;"></div></div><div class="imp-val">.00</div></div>
+
+      <div class="cm-wrap">
+        <table class="cm">
+          <tr><th></th><th>pred:<br>under</th><th>pred:<br>mid</th><th>pred:<br>over</th></tr>
+          <tr><th class="rowh">actual: under</th><td class="diag">2</td><td>1</td><td>2</td></tr>
+          <tr><th class="rowh">actual: mid</th><td>2</td><td class="diag">3</td><td>1</td></tr>
+          <tr><th class="rowh">actual: over</th><td>2</td><td>1</td><td class="diag">2</td></tr>
+        </table>
+        <div class="cm-note">Nested LOO-CV predictions, all 16 events. Diagonal = correct. Forced-selling flow
+          (<code class="k" style="font-size:8.6px;">forced_flow_adv</code>) drives most splits — more than
+          <code class="k" style="font-size:8.6px;">prob_included</code> alone.</div>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="footer">
+    <div class="pill">n=16</div>
+    <div class="txt">
+      Read as hypothesis, not strategy. <b>44% vs. 38%</b> is a real, leakage-free improvement — but it comes from
+      one tree shape confirmed across all 16 outer folds, not a genuine complexity search. Next: how this tree's
+      predictions turn into a position-sizing weight (Slide 2 of 2).
+    </div>
+  </div>
+
+</div>
+</body>
+</html>
