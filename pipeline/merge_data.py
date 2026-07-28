@@ -16,10 +16,10 @@ Outputs:
   data/clean/spinoff_price_windows.parquet  — long-format daily parent prices,
                                               ±90 days around each spinoff date
 
-Run order:
-  1. python repull_data.py            (pulls CRSP/Compustat via WRDS)
-  2. python pull_etf_aum.py           (pulls passive fund AUM via WRDS)
-  3. python merge_data.py             (combine; add --pull-crsp to also fetch parent prices)
+Run order (from repo root):
+  1. python pipeline/repull_data.py      (pulls CRSP/Compustat via WRDS)
+  2. python pipeline/pull_etf_aum.py     (pulls passive fund AUM via WRDS)
+  3. python pipeline/merge_data.py       (combine; add --pull-crsp to also fetch parent prices)
 
 Flags:
   --pull-crsp   Connect to WRDS and fetch CRSP daily prices for parent company
@@ -35,7 +35,9 @@ import pandas as pd
 import numpy as np
 from pathlib import Path
 
-_env_path = Path(__file__).parent / ".env"
+# Repo root — this file lives in pipeline/, so .env and data/ are one level up.
+ROOT_DIR = Path(__file__).resolve().parent.parent
+_env_path = ROOT_DIR / ".env"
 if _env_path.exists():
     for _line in _env_path.read_text().splitlines():
         _line = _line.strip()
@@ -63,8 +65,8 @@ def _auto_getpass(prompt="Password: ", stream=None):
 builtins.input  = _auto_input
 getpass.getpass = _auto_getpass
 
-RAW_DIR = Path("data/raw")
-CLEAN_DIR = Path("data/clean")
+RAW_DIR = ROOT_DIR / "data/raw"
+CLEAN_DIR = ROOT_DIR / "data/clean"
 
 EVENT_WINDOW_DAYS = 90  # calendar days on each side of effective date
 

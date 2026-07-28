@@ -61,8 +61,8 @@ plt.rcParams['axes.grid'] = True
 plt.rcParams['grid.alpha'] = 0.3
 sns.set_palette('husl')
 
-RAW_DIR   = Path('data/raw')
-CLEAN_DIR = Path('data/clean')
+RAW_DIR   = Path('../data/raw')
+CLEAN_DIR = Path('../data/clean')
 
 # %% [markdown]
 # ## 1. Data Loading & Feature Engineering

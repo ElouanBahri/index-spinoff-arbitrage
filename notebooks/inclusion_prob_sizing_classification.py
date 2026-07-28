@@ -59,8 +59,8 @@ from sklearn.metrics import accuracy_score, confusion_matrix, classification_rep
 pd.set_option('display.max_columns', 50)
 pd.set_option('display.float_format', '{:,.4f}'.format)
 
-RAW_DIR   = Path('data/raw')
-CLEAN_DIR = Path('data/clean')
+RAW_DIR   = Path('../data/raw')
+CLEAN_DIR = Path('../data/clean')
 
 # %% [markdown]
 # ## 1. Load `prob_included` and rebuild the parent's post-completion CAR

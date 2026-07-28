@@ -45,8 +45,8 @@ plt.rcParams['axes.grid'] = True
 plt.rcParams['grid.alpha'] = 0.3
 sns.set_palette('husl')
 
-RAW_DIR   = Path('data/raw')
-CLEAN_DIR = Path('data/clean')
+RAW_DIR   = Path('../data/raw')
+CLEAN_DIR = Path('../data/clean')
 
 events  = pd.read_csv(CLEAN_DIR / 'spinoff_events_merged.csv', parse_dates=['announce_date', 'effective_date'])
 crsp    = pd.read_parquet(RAW_DIR / 'crsp_daily.parquet').sort_values(['permno', 'date']).reset_index(drop=True)
