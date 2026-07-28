@@ -22,7 +22,9 @@ import wrds
 import pandas as pd
 from pathlib import Path
 
-_env_path = Path(__file__).parent / ".env"
+# Repo root — this file lives in pipeline/, so .env and data/ are one level up.
+ROOT_DIR = Path(__file__).resolve().parent.parent
+_env_path = ROOT_DIR / ".env"
 if _env_path.exists():
     for _line in _env_path.read_text().splitlines():
         _line = _line.strip()
@@ -50,7 +52,7 @@ def _auto_getpass(prompt="Password: ", stream=None):
 builtins.input  = _auto_input
 getpass.getpass = _auto_getpass
 
-RAW_DIR = Path("data/raw")
+RAW_DIR = ROOT_DIR / "data/raw"
 RAW_DIR.mkdir(parents=True, exist_ok=True)
 
 # Keywords that identify S&P 500 tracking mandates in fund names

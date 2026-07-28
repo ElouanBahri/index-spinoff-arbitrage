@@ -42,8 +42,8 @@ plt.rcParams['figure.figsize'] = (12, 5)
 plt.rcParams['axes.grid'] = True
 plt.rcParams['grid.alpha'] = 0.3
 
-RAW_DIR   = Path('data/raw')
-CLEAN_DIR = Path('data/clean')
+RAW_DIR   = Path('../data/raw')
+CLEAN_DIR = Path('../data/clean')
 
 # %% [markdown]
 # ## 1. Load Data

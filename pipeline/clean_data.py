@@ -1,10 +1,15 @@
+from pathlib import Path
+
 import pandas as pd
+
+# Repo root — this file lives in pipeline/, so data/ is one level up.
+ROOT_DIR = Path(__file__).resolve().parent.parent
 
 # ==========================================
 # CONFIGURATION: CHANGE THESE PATHS
 # ==========================================
-INPUT_FILE_PATH = "data/clean/cleaned_spinoff_data.csv"
-OUTPUT_FILE_PATH = "data/clean/cleaned_spinoff_data.csv"
+INPUT_FILE_PATH = ROOT_DIR / "data/clean/cleaned_spinoff_data.csv"
+OUTPUT_FILE_PATH = ROOT_DIR / "data/clean/cleaned_spinoff_data.csv"
 
 
 def clean_and_rename_bloomberg(input_path, output_path):

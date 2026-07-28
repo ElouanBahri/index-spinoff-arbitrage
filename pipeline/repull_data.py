@@ -10,8 +10,8 @@ Key changes vs. original pull:
   3. ETF AUM: pulls passive S&P 500 fund AUM from CRSP Mutual Fund DB using
      the correct tables (monthly_tna / monthly_returns, not fund_summary).
 
-Run:
-  python repull_data.py
+Run (from repo root):
+  python pipeline/repull_data.py
 
 Outputs (all written to data/raw/):
   sp500_constituents_pit.parquet        — S&P 500 member history from 2010
@@ -28,8 +28,11 @@ import builtins
 import getpass
 from pathlib import Path
 
+# Repo root — this file lives in pipeline/, so .env and data/ are one level up.
+ROOT_DIR = Path(__file__).resolve().parent.parent
+
 # Load .env before anything else
-_env_path = Path(__file__).parent / ".env"
+_env_path = ROOT_DIR / ".env"
 if _env_path.exists():
     for _line in _env_path.read_text().splitlines():
         _line = _line.strip()
@@ -62,8 +65,8 @@ getpass.getpass   = _auto_getpass
 import wrds
 import pandas as pd
 
-RAW_DIR   = Path("data/raw")
-CLEAN_DIR = Path("data/clean")
+RAW_DIR   = ROOT_DIR / "data/raw"
+CLEAN_DIR = ROOT_DIR / "data/clean"
 RAW_DIR.mkdir(parents=True, exist_ok=True)
 
 CRSP_START       = "2010-01-01"
